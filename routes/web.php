@@ -2,9 +2,11 @@
 
 use App\Livewire\EmployeeManagement;
 use App\Livewire\Auth\Login;
+use App\Livewire\Bank;
 use App\Livewire\Dashboard;
 use App\Livewire\Departement;
 use App\Livewire\MenuManagement;
+use App\Livewire\OperationalPos;
 use App\Livewire\Product;
 use App\Livewire\ProductCategory;
 use App\Livewire\RolesPermissions;
@@ -18,6 +20,7 @@ Route::get('/login', Login::class)->name('login');
 Route::get('/logout', [Login::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
+    // MASTERDATA
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
     Route::get('/user', User::class)->name('user');
     Route::get('/employee', EmployeeManagement::class)->name('employee');
@@ -26,6 +29,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/departement', Departement::class)->name('departement');
     Route::get('/product', Product::class)->name('product');
     Route::get('/product-category', action: ProductCategory::class)->name('product-category');
+    Route::get('/bank', Bank::class)->name('bank');
+
+    // OPERATIONAL
+    Route::get('/operational-pos', OperationalPos::class)->name('operational-pos');
     Route::get('/test', MenuManagement::class)->name('test');
 });
 Route::fallback(function () {

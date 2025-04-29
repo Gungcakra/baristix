@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Product as ModelsProduct;
 use App\Models\ProductCategory;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -13,9 +14,16 @@ class Product extends Component
 {
     use WithFileUploads;
     public $product, $productCategory, $name, $price, $file_path, $productId, $search = '';
-    protected $listeners = ['deleteProductConfirm', 'deleteProduct'];
+    protected $listeners = [ 'deleteProduct'];
     public function mount()
     {
+        $userPermissions = Auth::user()->roles->flatMap(function ($role) {
+            return $role->permissions->pluck('name');
+        });
+    
+        if (!$userPermissions->contains('masterdata-product')) {
+            abort(403, 'Unauthorized action.');
+        }
         $this->product = ModelsProduct::with('productCategory')->get();
     }
     public function openModal()
@@ -24,7 +32,7 @@ class Product extends Component
     }
     public function closeModal()
     {
-        $this->reset(['name', 'price', 'file_path','productCategory', 'productId']);
+        $this->reset(['name', 'price','file_path','productCategory', 'productId']);
         $this->dispatch('hide-modal');
         $this->productId = null;
     }
@@ -55,12 +63,29 @@ class Product extends Component
 
             
             $this->dispatch('success', 'Product saved successfully.');
+            $this->closeModal();
         }  catch(\Exception $e){
             $this->dispatch('error', 'Failed to save product: ' . $e->getMessage());
             return;
         }
     }
     
+
+    public function edit($id)
+    {
+        $this->productId = $id;
+        $product = ModelsProduct::find($id);
+        if ($product) {
+            $this->name = $product->name;
+            $this->price = $product->price;
+            $this->file_path = $product->file_path;
+            $this->productCategory = $product->product_category_id;
+            $this->openModal();
+        } else {
+            $this->dispatch('error', 'Product not found.');
+        }
+    }
+
     public function update()
     {
         try{
@@ -89,26 +114,37 @@ class Product extends Component
 
             
             $this->dispatch('success', 'Product updated successfully.');
+            $this->closeModal();
         }  catch(\Exception $e){
             $this->dispatch('error', 'Failed to update product: ' . $e->getMessage());
             return;
         }
     }
-
-    public function edit($id)
+    
+    public function delete($id)
     {
         $this->productId = $id;
-        $product = ModelsProduct::find($id);
-        if ($product) {
-            $this->name = $product->name;
-            $this->price = $product->price;
-            $this->file_path = $product->file_path;
-            $this->productCategory = $product->product_category_id;
-            $this->openModal();
-        } else {
-            $this->dispatch('error', 'Product not found.');
+        $this->dispatch('confirm-delete', 'Are you sure you want to delete this product?');
+    }
+    public function deleteProduct()
+    {
+        try{
+            $product = ModelsProduct::find($this->productId);
+            if ($product) {
+                if ($product->file_path && Storage::disk('public')->exists($product->file_path)) {
+                    Storage::disk('public')->delete($product->file_path);
+                }
+                $product->delete();
+                $this->dispatch('delete-success', 'Product deleted successfully.');
+            } else {
+                $this->dispatch('error', 'Product not found.');
+            }
+        }  catch(\Exception $e){
+            $this->dispatch('error', 'Failed to delete product: ' . $e->getMessage());
+            return;
         }
     }
+
     public function render()
     {
         return view('livewire.pages.admin.masterdata.product.index', [

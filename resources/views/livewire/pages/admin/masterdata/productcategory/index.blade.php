@@ -1,6 +1,6 @@
 <div class="d-flex flex-column flex-column-fluid">
   
-    <x-slot:title>Product Management</x-slot:title>
+    <x-slot:title>Product Category Management</x-slot:title>
     <!--begin::Toolbar-->
     <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
         <!--begin::Toolbar container-->
@@ -8,7 +8,7 @@
             <!--begin::Page title-->
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
                 <!--begin::Title-->
-                <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">Product Management</h1>
+                <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">Product Category Management</h1>
                 <!--end::Title-->
                 <!--begin::Breadcrumb-->
                 <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
@@ -23,13 +23,13 @@
                     </li>
                     <!--end::Item-->
                     <!--begin::Item-->
-                    <li class="breadcrumb-item text-muted">Product</li>
+                    <li class="breadcrumb-item text-muted">Product Category</li>
                     <!--end::Item-->
                 </ul>
                 <!--end::Breadcrumb-->
             </div>
             <div class="d-flex items-center">
-                {{-- <input type="text" class="form-control form-control-solid" placeholder="Search Product Name" id="search" autocomplete="off" wire:model.live.debounce.100ms="search" /> --}}
+                {{-- <input type="text" class="form-control form-control-solid" placeholder="Search Product Category Name" id="search" autocomplete="off" wire:model.live.debounce.100ms="search" /> --}}
 
                 {{-- <select class="form-select" data-control="select2" data-placeholder="Select Customer" name="departement_id" id="departement_id" onchange="@this.set('selectedDepartement', this.value)">
                     <option>Select Departement</option>
@@ -48,7 +48,7 @@
                 {{-- <a href="#" class="btn btn-sm fw-bold btn-secondary" data-bs-toggle="modal" data-bs-target="#kt_modal_create_app">Rollover</a> --}}
                 <!--end::Secondary button-->
                 <!--begin::Primary button-->
-                <button class="btn btn-sm fw-bold btn-primary" wire:click="create()">Add Product</button>
+                <button class="btn btn-sm fw-bold btn-primary" wire:click="create()">Add Product Category</button>
                 <!--end::Primary button-->
             </div>
             <!--end::Actions-->
@@ -72,7 +72,7 @@
                             type="text"
                             data-kt-customer-table-filter="search"
                             class="form-control form-control-solid w-250px ps-12"
-                            placeholder="Search Product"
+                            placeholder="Search Product Category"
                             wire:model.live.debounce.100ms="search"
                         />
                     </div>
@@ -85,9 +85,6 @@
                                 <th>No</th>
                                 <th>Action</th>
                                 <th>Name</th>
-                                <th>Category</th>
-                                <th>Price</th>
-                                <th>Image</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -97,9 +94,9 @@
                             </tr>
                             @else
     
-                            @foreach ( $data as $index => $product)
+                            @foreach ( $data as $index => $productCategory)
     
-                            <tr wire:key="product-{{ $product->id }}">
+                            <tr wire:key="product-{{ $productCategory->id }}">
                                 <td>{{ $index + 1 }}</td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-light btn-flex btn-center btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
@@ -108,21 +105,16 @@
                                     <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4" data-kt-menu="true">
                                         <!--begin::Menu item-->
                                         <div class="menu-item px-3">
-                                            <a wire:click="edit({{ $product->id }})" class="menu-link px-3 w-100">Edit</a>
+                                            <a wire:click="edit({{ $productCategory->id }})" class="menu-link px-3 w-100">Edit</a>
                                         </div>
                                         <!--end::Menu item-->
                                         <!--begin::Menu item-->
                                         <div class="menu-item px-3">
-                                            <a href="#" class="menu-link px-3 w-100" data-kt-ecommerce-product-filter="delete_row" wire:click="delete({{ $product->id }})">Delete</a>
+                                            <a href="#" class="menu-link px-3 w-100" data-kt-ecommerce-product-filter="delete_row" wire:click="delete({{ $productCategory->id }})">Delete</a>
                                         </div>
                                         <!--end::Menu item-->
                                 </td>
-                                <td>{{ $product->name }}</td>
-                                <td>{{ $product->productCategory->name }}</td>
-                                <td>RP {{ number_format($product->price, 0, ',', '.') }}</td>
-                                <td>
-                                    <img src="{{ Storage::url($product->file_path) }}" alt="{{ $product->name }}" width="50" height="50">
-                                </td>
+                                <td>{{ $productCategory->name }}</td>
 
                             </tr>
                             @endforeach
@@ -136,7 +128,7 @@
                     </div>
                 </div>
     
-               @include('livewire.pages.admin.masterdata.product.modal')
+               @include('livewire.pages.admin.masterdata.productcategory.modal')
             </div>
 
         </div>
@@ -146,7 +138,7 @@
 <script>
     $(function() {
         Livewire.on('show-modal', () => {
-        var modalEl = document.getElementById('productModal');
+        var modalEl = document.getElementById('productCategoryModal');
         var existingModal = bootstrap.Modal.getInstance(modalEl);
         if (!existingModal) {
             var myModal = new bootstrap.Modal(modalEl, {});
@@ -156,7 +148,7 @@
         }
     });
     Livewire.on('hide-modal', () => {
-        var modalEl = document.getElementById('productModal');
+        var modalEl = document.getElementById('productCategoryModal');
         var modal = bootstrap.Modal.getInstance(modalEl);
         if (modal) {
             modal.hide();
@@ -181,7 +173,7 @@
             , icon: "warning"
         }).then((result) => {
             if (result.isConfirmed) {
-                Livewire.dispatch('deleteProduct');
+                Livewire.dispatch('deleteProductCategory');
             } else {
                 Swal.fire("Cancelled", "Delete Cancelled.", "info");
             }

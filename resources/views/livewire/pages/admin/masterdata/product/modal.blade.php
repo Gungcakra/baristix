@@ -1,4 +1,4 @@
-<div class="modal fade" tabindex="-1" id="productModal" aria-hidden="true">
+<div class="modal fade" tabindex="-1" id="productModal" aria-hidden="true" wire:ignore.self>
 
     <div class="modal-dialog">
         <div class="modal-content">
@@ -87,45 +87,45 @@
 
                         <style>
                             .image-input-placeholder {
-                                background-image: url('{{ $productId ? Storage::url($file_path) : asset('assets/media/svg/avatars/blank.svg') }}');
+                                background-image: url('{{ $file_path ? (filter_var($file_path, FILTER_VALIDATE_URL) ? $file_path : Storage::url($file_path)) : asset('assets/media/svg/avatars/blank.svg') }}');
                             }
-                            
+
                             [data-bs-theme="dark"] .image-input-placeholder {
-                                background-image: url('{{ $productId ? Storage::url($file_path) : asset('assets/media/svg/avatars/blank-dark.svg') }}');
+                                background-image: url('{{ $productId ? Storage::url($file_path) : ($file_path ? $file_path : asset('assets/media/svg/avatars/blank-dark.svg')) }}');
                             }
                         </style>
-                        <!--begin::Label-->
-                        <div class="image-input image-input-empty" data-kt-image-input="true">
-                            <!--begin::Image preview wrapper-->
-                            <div class="image-input-wrapper w-125px h-125px image-input-placeholder" b></div>
-                            <!--end::Image preview wrapper-->
+                        <div class="">
+                                <div class="image-input image-input-empty" data-kt-image-input="true">
+                                    <!--begin::Image preview wrapper-->
+                                    <div class="image-input-wrapper w-125px h-125px image-input-placeholder"></div>
+                                    <!--end::Image preview wrapper-->
 
-                            <!--begin::Edit button-->
-                            <label class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" data-bs-dismiss="click" title="Change avatar">
-                                <i class="ki-duotone ki-pencil fs-6"><span class="path1"></span><span class="path2"></span></i>
+                                    <!--begin::Edit button-->
+                                    <label class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" data-bs-dismiss="click" title="Change avatar">
+                                        <i class="ki-duotone ki-pencil fs-6"><span class="path1"></span><span class="path2"></span></i>
 
-                                <!--begin::Inputs-->
-                                <input type="file" wire:model="file_path" name="avatar" accept=".png, .jpg, .jpeg" />
-                                <input type="hidden" name="avatar_remove" />
-                                <!--end::Inputs-->
-                            </label>
-                            <!--end::Edit button-->
+                                        <!--begin::Inputs-->
+                                        <input type="file" wire:model="file_path" name="avatar" accept=".png, .jpg, .jpeg" />
+                                        <input type="hidden" name="avatar_remove" />
+                                        <!--end::Inputs-->
+                                    </label>
+                                    <!--end::Edit button-->
 
-                            <!--begin::Cancel button-->
-                            <span class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" data-bs-dismiss="click" title="Cancel avatar">
-                                <i class="ki-outline ki-cross fs-3"></i>
-                            </span>
-                            <!--end::Cancel button-->
+                                    <!--begin::Cancel button-->
+                                    <span class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" data-bs-dismiss="click" title="Cancel avatar">
+                                        <i class="ki-outline ki-cross fs-3"></i>
+                                    </span>
+                                    <!--end::Cancel button-->
 
-                            <!--begin::Remove button-->
-                            <span class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" data-bs-dismiss="click" title="Remove avatar">
-                                <i class="ki-outline ki-cross fs-3"></i>
-                            </span>
-                            <!--end::Remove button-->
+                                    <!--begin::Remove button-->
+                                    <span class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" data-bs-dismiss="click" title="Remove avatar">
+                                        <i class="ki-outline ki-cross fs-3"></i>
+                                    </span>
+                                    <!--end::Remove button-->
+                                </div>
+                            </div>
+
                         </div>
-                        <!--end::Image input-->
-
-                    </div>
                 </div>
                 <!--end::Input group-->
 
