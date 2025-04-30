@@ -85,7 +85,7 @@
                     </div>
                     <div class="d-flex flex-column col-md-6 mb-8 fv-row">
 
-                        <style>
+                        {{-- <style>
                             .image-input-placeholder {
                                 background-image: url('{{ $file_path ? (filter_var($file_path, FILTER_VALIDATE_URL) ? $file_path : Storage::url($file_path)) : asset('assets/media/svg/avatars/blank.svg') }}');
                             }
@@ -93,11 +93,20 @@
                             [data-bs-theme="dark"] .image-input-placeholder {
                                 background-image: url('{{ $productId ? Storage::url($file_path) : ($file_path ? $file_path : asset('assets/media/svg/avatars/blank-dark.svg')) }}');
                             }
-                        </style>
+                        </style> --}}
                         <div class="">
                                 <div class="image-input image-input-empty" data-kt-image-input="true">
                                     <!--begin::Image preview wrapper-->
-                                    <div class="image-input-wrapper w-125px h-125px image-input-placeholder"></div>
+                                    <div class="image-input-wrapper w-125px h-125px" style="
+                                        @if($photoPath)
+                                            background-image: url('{{ $photo->temporaryUrl() }}');
+                                        @elseif($file_path)
+                                            background-image: url('{{ Storage::url($file_path) }}');
+                                        @else
+                                            background-image: url('{{ asset('assets/media/svg/avatars/blank.svg') }}');
+                                        @endif
+                                        background-size: cover; background-position: center;">
+                                    </div>
                                     <!--end::Image preview wrapper-->
 
                                     <!--begin::Edit button-->
@@ -105,24 +114,26 @@
                                         <i class="ki-duotone ki-pencil fs-6"><span class="path1"></span><span class="path2"></span></i>
 
                                         <!--begin::Inputs-->
-                                        <input type="file" wire:model="file_path" name="avatar" accept=".png, .jpg, .jpeg" />
+                                        <input type="file" wire:model="photo" name="avatar" accept=".png, .jpg, .jpeg" />
                                         <input type="hidden" name="avatar_remove" />
                                         <!--end::Inputs-->
                                     </label>
                                     <!--end::Edit button-->
 
                                     <!--begin::Cancel button-->
-                                    <span class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" data-bs-dismiss="click" title="Cancel avatar">
+                                    {{-- <span class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" data-bs-dismiss="click" title="Cancel avatar">
                                         <i class="ki-outline ki-cross fs-3"></i>
-                                    </span>
+                                    </span> --}}
                                     <!--end::Cancel button-->
 
                                     <!--begin::Remove button-->
-                                    <span class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" data-bs-dismiss="click" title="Remove avatar">
-                                        <i class="ki-outline ki-cross fs-3"></i>
-                                    </span>
                                     <!--end::Remove button-->
                                 </div>
+                                <span class="btn btn-icon btn-circle btn-color-muted w-25px h-25px bg-body shadow" 
+                                    wire:click="{{ $photo ? 'removePhoto' : ($file_path ? 'removeFilePath(\'' . $file_path . '\')' : 'removeTest') }}" 
+                                    title="{{ $photo ? 'Remove photo' : ($file_path ? 'Remove file' : 'Remove avatar') }}">
+                                    <i class="ki-outline ki-cross fs-3"></i>
+                                </span>
                             </div>
 
                         </div>

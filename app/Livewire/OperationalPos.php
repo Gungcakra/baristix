@@ -11,7 +11,7 @@ use Livewire\Component;
 #[Layout('layouts.admin')]
 class OperationalPos extends Component
 {
-    public $selectedCategory = 1, $productCategoryId, $productAdd = [];
+    public $selectedCategory = 1, $productCategoryId, $productAdd = [], $total = 0;
 
     public function mount()
     {
@@ -33,36 +33,37 @@ class OperationalPos extends Component
     {
         $productData = Product::find($id);
         if ($productData) {
-          
-                foreach ($this->productAdd as &$prod) {
-                    if ($prod['id'] === $productData->id) {
-                        $prod['quantity'] = isset($prod['quantity']) ? $prod['quantity'] + 1 : 2;
-                        $prod['price'] = $productData->price * $prod['quantity'];
-                        
-                        return;
-                    }
+            foreach ($this->productAdd as &$prod) {
+                if ($prod['id'] === $productData->id) {
+                    $prod['quantity'] = isset($prod['quantity']) ? $prod['quantity'] + 1 : 2;
+                    $prod['price'] = $productData->price * $prod['quantity'];
+                    $this->setTotal();
+                    return;
                 }
-                $this->productAdd[] = [
-                    'id' => $productData->id,
-                    'name' => $productData->name,
-                    'price' => $productData->price,
-                    'file_path' => $productData->file_path,
-                    'quantity' => 1,
-                ];
-                
-            } 
-           
+            }
+            $this->productAdd[] = [
+                'id' => $productData->id,
+                'name' => $productData->name,
+                'price' => $productData->price,
+                'file_path' => $productData->file_path,
+                'quantity' => 1,
+            ];
+            $this->setTotal();
         }
+    }
 
     public function addQty($id)
     {
-        foreach ($this->productAdd  as &$prod) {
+        foreach ($this->productAdd as &$prod) {
             if ($prod['id'] === $id) {
                 $prod['quantity'] += 1;
                 $prod['price'] = $prod['quantity'] * Product::find($id)->price;
+                $this->setTotal();
+                return;
             }
         }
     }
+
     public function minQty($id)
     {
         foreach ($this->productAdd as $key => &$prod) {
@@ -70,10 +71,20 @@ class OperationalPos extends Component
                 if ($prod['quantity'] > 1) {
                     $prod['quantity'] -= 1;
                     $prod['price'] = $prod['quantity'] * Product::find($id)->price;
-                }else{
+                } else {
                     unset($this->productAdd[$key]);
                 }
+                $this->setTotal();
+                return;
             }
+        }
+    }
+
+    public function setTotal()
+    {
+        $this->total = 0; // Reset total before recalculating
+        foreach ($this->productAdd as $prod) {
+            $this->total += $prod['price'];
         }
     }
     public function render()

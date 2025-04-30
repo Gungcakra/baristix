@@ -145,6 +145,16 @@
 @push('scripts')
 <script>
     $(function() {
+        Livewire.on('file-uploaded', (message) => {
+            if (!toastr.getContainer()) {
+            toastr.success(message);
+            }
+        });
+        Livewire.on('file-removed', (message) => {
+            if (!toastr.getContainer()) {
+            toastr.success(message);
+            }
+        });
         Livewire.on('show-modal', () => {
         var modalEl = document.getElementById('productModal');
         var existingModal = bootstrap.Modal.getInstance(modalEl);

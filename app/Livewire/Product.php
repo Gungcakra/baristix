@@ -9,18 +9,19 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
+
 #[Layout('layouts.admin')]
 class Product extends Component
 {
     use WithFileUploads;
-    public $product, $productCategory, $name, $price, $file_path, $productId, $search = '';
-    protected $listeners = [ 'deleteProduct'];
+    public $product, $productCategory, $name, $price, $file_path, $productId, $search = '', $photo, $photoPath;
+    protected $listeners = ['deleteProduct'];
     public function mount()
     {
         $userPermissions = Auth::user()->roles->flatMap(function ($role) {
             return $role->permissions->pluck('name');
         });
-    
+
         if (!$userPermissions->contains('masterdata-product')) {
             abort(403, 'Unauthorized action.');
         }
@@ -32,7 +33,7 @@ class Product extends Component
     }
     public function closeModal()
     {
-        $this->reset(['name', 'price','file_path','productCategory', 'productId']);
+        $this->reset(['name', 'price', 'file_path', 'productCategory', 'productId']);
         $this->dispatch('hide-modal');
         $this->productId = null;
     }
@@ -40,36 +41,52 @@ class Product extends Component
     {
         $this->openModal();
     }
-    
+
+    public function updatedPhoto()
+    {
+        $this->photoPath = $this->photo->store('products', 'public');
+        $this->dispatch('file-uploaded', 'Image uploaded successfully');
+    }
+
+    public function removePhoto()
+    {
+
+        if ($this->photoPath && Storage::disk('public')->exists($this->photoPath)) {
+            Storage::disk('public')->delete($this->photoPath);
+            $this->photoPath = null;
+            $this->dispatch('file-removed', 'Image removed successfully');
+        } else {
+            $this->dispatch('error', 'Image not found.');
+        }
+    }
     public function store()
     {
-        try{
+        try {
             $this->validate([
                 'name' => 'required',
                 'productCategory' => 'required|exists:product_categories,id',
                 'price' => 'required|numeric',
-                'file_path' => 'required|image|max:2048',
+                'photo' => 'required|image|max:2048',
             ]);
-         
-            if ($this->file_path) {
-                $this->file_path = $this->file_path->store('products', 'public');
-            }
+
+
             ModelsProduct::create([
                 'name' => $this->name,
                 'product_category_id' => $this->productCategory,
                 'price' => $this->price,
-                'file_path' => $this->file_path,
+                'file_path' => $this->photoPath,
             ]);
 
-            
+
             $this->dispatch('success', 'Product saved successfully.');
+            $this->reset(['photo', 'photoPath']);
             $this->closeModal();
-        }  catch(\Exception $e){
+        } catch (\Exception $e) {
             $this->dispatch('error', 'Failed to save product: ' . $e->getMessage());
             return;
         }
     }
-    
+
 
     public function edit($id)
     {
@@ -88,22 +105,20 @@ class Product extends Component
 
     public function update()
     {
-        try{
+        try {
             $this->validate([
                 'name' => 'required',
                 'productCategory' => 'required|exists:product_categories,id',
                 'price' => 'required|numeric',
-                'file_path' => 'image|max:2048',
             ]);
-         
+
             $product = ModelsProduct::find($this->productId);
-            if ($this->file_path) {
-                if ($product && $product->file_path && Storage::disk('public')->exists($product->file_path)) {
-                    Storage::disk('public')->delete($product->file_path);
-                }
-                $this->file_path = $this->file_path->store('products', 'public');
-            } else {
-                $this->file_path = $product->file_path;
+            if ($this->photoPath) {
+            $delete = Storage::disk('public')->delete($product->file_path);
+            if ($delete) {
+                $this->dispatch('file-removed', 'Old image deleted successfully');
+                    $this->file_path = $this->photoPath;
+                } 
             }
             $product->update([
                 'name' => $this->name,
@@ -111,16 +126,14 @@ class Product extends Component
                 'price' => $this->price,
                 'file_path' => $this->file_path,
             ]);
-
-            
+            $this->reset(['photo', 'photoPath']);
             $this->dispatch('success', 'Product updated successfully.');
             $this->closeModal();
-        }  catch(\Exception $e){
+        } catch (\Exception $e) {
             $this->dispatch('error', 'Failed to update product: ' . $e->getMessage());
             return;
         }
     }
-    
     public function delete($id)
     {
         $this->productId = $id;
@@ -128,18 +141,20 @@ class Product extends Component
     }
     public function deleteProduct()
     {
-        try{
+        try {
             $product = ModelsProduct::find($this->productId);
             if ($product) {
                 if ($product->file_path && Storage::disk('public')->exists($product->file_path)) {
                     Storage::disk('public')->delete($product->file_path);
                 }
                 $product->delete();
+                $this->reset(['photo', 'photoPath']);
+                $this->productId = null;
                 $this->dispatch('delete-success', 'Product deleted successfully.');
             } else {
                 $this->dispatch('error', 'Product not found.');
             }
-        }  catch(\Exception $e){
+        } catch (\Exception $e) {
             $this->dispatch('error', 'Failed to delete product: ' . $e->getMessage());
             return;
         }

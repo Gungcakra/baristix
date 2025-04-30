@@ -7,7 +7,7 @@
             <!--begin::Page title-->
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
                 <!--begin::Title-->
-                <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">Service Finalization</h1>
+                <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">POS Operational</h1>
                 <!--end::Title-->
                 <!--begin::Breadcrumb-->
                 <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1" style="cursor: pointer">
@@ -63,7 +63,7 @@
                         @foreach ($productCategory as $pc )      
                         <li class="nav-item mb-3 me-0">
                             <!--begin::Nav link-->
-                            <a class="nav-link nav-link-border-solid btn btn-outline btn-flex btn-active-color-primary flex-column flex-stack pt-9 pb-7 page-bg " data-bs-toggle="pill" href="#{{ $pc->name }}" wire:click="setCategory({{ $pc->id }})" style="width: 138px;height: 180px">
+                            <a class="nav-link nav-link-border-solid btn btn-outline btn-flex btn-active-color-primary flex-column flex-stack pt-9 pb-7 page-bg {{ $selectedCategory === $pc->id ? 'active' : '' }}" data-bs-toggle="pill" href="#{{ $pc->name }}" wire:click="setCategory({{ $pc->id }})" style="width: 138px;height: 180px">
                                 <!--begin::Icon-->
                                 <div class="nav-icon mb-3">
                                     <!--begin::Food icon-->
@@ -104,7 +104,7 @@
                                             <!--begin::Title-->
                                             <div class="text-center">
                                                 <span class="fw-bold text-gray-800 cursor-pointer text-hover-primary fs-3 fs-xl-1">{{ $item->name }}</span>
-                                                <span class="text-gray-400 fw-semibold d-block fs-6 mt-n1">16 mins to cook</span>
+                                                {{-- <span class="text-gray-400 fw-semibold d-block fs-6 mt-n1">16 mins to cook</span> --}}
                                             </div>
                                             <!--end::Title-->
                                         </div>
@@ -221,7 +221,7 @@
                             <span class="d-block lh-1 mb-2" data-kt-pos-element="total">$100.50</span>
                             <span class="d-block mb-2" data-kt-pos-element="discount">-$8.00</span>
                             <span class="d-block mb-9" data-kt-pos-element="tax">$11.20</span>
-                            <span class="d-block fs-2qx lh-1" data-kt-pos-element="grant-total">$93.46</span>
+                            <span class="d-block fs-2qx lh-1" data-kt-pos-element="grant-total">{{ 'Rp ' . number_format($total, 0, ',', '.') }}</span>
                         </div>
                         <!--end::Content-->
                     </div>

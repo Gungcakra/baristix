@@ -72,6 +72,7 @@ class DatabaseSeeder extends Seeder
             'masterdata-role',
             'masterdata-product',
             'masterdata-product-category',
+            'operational-pos',
 
                     
         ];
@@ -90,6 +91,7 @@ class DatabaseSeeder extends Seeder
             'masterdata-role',
             'masterdata-product',
             'masterdata-product-category',
+            'operational-pos',
         ]);
 
         $admin->syncPermissions([
@@ -101,6 +103,7 @@ class DatabaseSeeder extends Seeder
             'masterdata-departement',
             'masterdata-product',
             'masterdata-product-category',
+            'operational-pos',
         ]);
 
         $employee->syncPermissions([
@@ -205,8 +208,21 @@ class DatabaseSeeder extends Seeder
         ]);
        
 
-
-     
+        // Menu Operational
+        $operational = Menu::create([
+            'name' => 'Operational',
+            'icon' => 'fa-solid fa-clipboard-list',
+            'route' => null,
+            'order' => 3
+        ]);
+        
+        Submenu::create([
+            'menu_id' => $operational->id,
+            'name' => 'POS',
+            'route' => 'operational-pos',
+            'order' => 0,
+            'permission_id' => Permission::where('name', 'operational-pos')->first()->id
+        ]);
 
        
 
